@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Name Your Run | AI-Powered Run Stories</title>
+  <meta name="description" content="Give your run a name and a story. AI generates a unique motivational quote for every run — before or after. Share it on Instagram." />
+  <meta name="keywords" content="running motivation, name your run, running quote, run story, running instagram, runner motivation" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="Name Your Run | AI-Powered Run Stories" />
+  <meta property="og:description" content="Every run deserves a name. Get an AI-generated story and shareable card for your run." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://recepzerk.github.io/name-your-run" />
+  <link rel="canonical" href="https://recepzerk.github.io/name-your-run" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f7f4f0;
+      --surface:  #ffffff;
+      --surface2: #f0ece6;
+      --surface3: #e8e2da;
+      --border:   rgba(0,0,0,0.08);
+      --border2:  rgba(0,0,0,0.14);
+      --text:     #1a1410;
+      --muted:    #6b5f54;
+      --dim:      #a09080;
+      --accent:   #c8400a;
+      --accent2:  #a33208;
+      --red:      #d63030;
+      --orange:   #e07020;
+      --blue:     #2460c8;
+      --green:    #1a8a50;
+      --purple:   #7040c0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap { max-width: 640px; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
+
+    /* ── HEADER ── */
+    header { margin-bottom: 2.5rem; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); font-weight: 600; margin-bottom: 10px;
+    }
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(52px, 12vw, 96px);
+      font-weight: 900;
+      font-style: italic;
+      line-height: 0.9; letter-spacing: -1px;
+      color: var(--text);
+    }
+    h1 span { color: var(--accent); font-style: italic; }
+    .tagline { margin-top: 12px; font-size: 15px; color: var(--muted); font-weight: 400; }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .form-section { margin-bottom: 1.5rem; }
+    .form-section:last-child { margin-bottom: 0; }
+
+    .field-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text);
+      display: block; margin-bottom: 10px;
+    }
+
+    /* City input */
+    .city-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px; font-weight: 500;
+      padding: 12px 16px;
+      transition: border-color 0.2s;
+    }
+    .city-input:focus { outline: none; border-color: var(--accent); }
+    .city-input::placeholder { color: var(--dim); }
+
+    /* Chip grid */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 99px;
+      padding: 8px 16px;
+      font-size: 13px; font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--border2); color: var(--text); }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Mode buttons */
+    .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mode-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .mode-btn:hover { border-color: var(--border2); background: var(--surface3); }
+    .mode-btn.active-start { border-color: var(--green); background: rgba(26,138,80,0.08); }
+    .mode-btn.active-finish { border-color: var(--accent); background: rgba(200,64,10,0.08); }
+    .mode-icon { font-size: 28px; margin-bottom: 6px; }
+    .mode-label { font-size: 14px; font-weight: 600; color: var(--text); display: block; margin-bottom: 2px; }
+    .mode-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* Generate button */
+    .gen-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-style: italic;
+      font-size: 22px; letter-spacing: 1px;
+      border: none; border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 1.25rem;
+    }
+    .gen-btn:hover { background: var(--accent2); }
+    .gen-btn:active { transform: scale(0.98); }
+    .gen-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+    /* Loading */
+    .loading-bar {
+      display: none;
+      height: 3px;
+      background: var(--border2);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    .loading-bar.show { display: block; }
+    .loading-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      animation: loadSlide 1.5s ease-in-out infinite;
+    }
+    @keyframes loadSlide {
+      0% { width: 0%; margin-left: 0%; }
+      50% { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+
+    /* ── RESULT ── */
+    #result { display: none; }
+    #result.show { display: block; animation: fadeUp 0.4s both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Run card preview */
+    .card-preview-wrap {
+      margin-bottom: 1.25rem;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.12);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    }
+
+    #run-card {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      background: #0c0c0c;
+    }
+
+    /* Card background pattern */
+    #run-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle at 20% 80%, rgba(232,255,71,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .card-top { position: relative; z-index: 1; }
+    .card-mode-badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 99px;
+      margin-bottom: 1.5rem;
+    }
+    .card-mode-badge.start  { background: rgba(61,220,132,0.15); color: #3ddc84; border: 0.5px solid rgba(61,220,132,0.3); }
+    .card-mode-badge.finish { background: rgba(232,255,71,0.15); color: #e8ff47; border: 0.5px solid rgba(232,255,71,0.3); }
+
+    .card-run-name {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(22px, 5vw, 36px);
+      line-height: 1.05;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .card-middle { position: relative; z-index: 1; flex: 1; display: flex; align-items: center; }
+    .card-quote {
+      font-size: clamp(13px, 2.5vw, 16px);
+      font-weight: 300;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.65;
+      font-style: italic;
+      border-left: 2px solid var(--accent);
+      padding-left: 14px;
+    }
+
+    .card-bottom {
+      position: relative; z-index: 1;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .card-meta { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+    .card-meta strong { color: rgba(255,255,255,0.7); font-weight: 500; }
+    .card-brand {
+      font-family: 'Anton', sans-serif;
+      font-size: 13px; letter-spacing: 2px;
+      color: var(--accent); opacity: 0.6;
+    }
+
+    /* Action buttons */
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+    .action-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 500;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .action-btn:hover { background: var(--surface2); }
+    .action-btn.primary { background: var(--accent); color: #ffffff; border-color: var(--accent); font-weight: 600; }
+    .action-btn.primary:hover { background: var(--accent2); }
+    .action-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .regen-btn {
+      width: 100%;
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 2rem;
+    }
+    .regen-btn:hover { color: var(--text); border-color: var(--border2); }
+
+    /* ── HISTORY ── */
+    .history { margin-top: 1rem; }
+    .history-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--dim); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .history-title::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+      transition: border-color 0.15s;
+    }
+    .history-item:hover { border-color: var(--border2); }
+    .history-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 99px; flex-shrink: 0; margin-top: 2px;
+    }
+    .history-badge.start  { background: rgba(26,138,80,0.1); color: #1a8a50; }
+    .history-badge.finish { background: rgba(200,64,10,0.1); color: #c8400a; }
+    .history-info { flex: 1; min-width: 0; }
+    .history-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .history-quote { font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-meta { font-size: 11px; color: var(--dim); margin-top: 4px; }
+    .history-del { background: none; border: none; cursor: pointer; color: var(--dim); font-size: 18px; padding: 0 4px; transition: color 0.15s; flex-shrink: 0; }
+    .history-del:hover { color: var(--red); }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 4rem; padding-top: 2rem;
+      border-top: 1px solid var(--border2);
+      font-size: 12px; color: var(--dim);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+
+    @media (max-width: 480px) {
+      .action-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <p class="eyebrow">✦ For runners</p>
+    <h1>Name<br>Your <span>Run</span></h1>
+    <p class="tagline">Every run deserves a name. Get an AI-generated story — before or after.</p>
+  </header>
+
+  <!-- FORM -->
+  <div class="form-card">
+
+    <!-- City -->
+    <div class="form-section">
+      <label class="field-label" for="city-input">📍 City</label>
+      <input type="text" class="city-input" id="city-input" placeholder="Istanbul, Berlin, New York..." maxlength="40" />
+    </div>
+
+    <!-- Distance -->
+    <div class="form-section">
+      <span class="field-label">📏 Distance</span>
+      <div class="chips" id="chips-distance" style="margin-bottom:10px;">
+        <div class="chip" onclick="pickDistance('5K',this)">5K</div>
+        <div class="chip" onclick="pickDistance('10K',this)">10K</div>
+        <div class="chip active" onclick="pickDistance('Half Marathon',this)">Half Marathon</div>
+        <div class="chip" onclick="pickDistance('Marathon',this)">Marathon</div>
+        <div class="chip" onclick="pickDistance('Ultra',this)">Ultra</div>
+        <div class="chip" onclick="pickDistance('Easy Run',this)">Easy Run</div>
+        <div class="chip" onclick="pickDistance('Tempo Run',this)">⚡ Tempo</div>
+        <div class="chip" onclick="pickDistance('Interval',this)">🔁 Interval</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="text" class="city-input" id="distance-custom"
+          placeholder="Or type anything: 7.5km, 3 miles, 90 min..."
+          maxlength="40"
+          oninput="onCustomDistance(this.value)"
+          style="font-size:14px;padding:10px 14px;" />
+      </div>
+    </div>
+
+    <!-- Weather -->
+    <div class="form-section">
+      <span class="field-label">🌤️ Weather</span>
+      <div class="chips" id="chips-weather">
+        <div class="chip active" onclick="pick('weather','Sunny',this)">☀️ Sunny</div>
+        <div class="chip" onclick="pick('weather','Rainy',this)">🌧️ Rainy</div>
+        <div class="chip" onclick="pick('weather','Windy',this)">💨 Windy</div>
+        <div class="chip" onclick="pick('weather','Foggy',this)">🌫️ Foggy</div>
+        <div class="chip" onclick="pick('weather','Snowy',this)">❄️ Snowy</div>
+        <div class="chip" onclick="pick('weather','Cold',this)">🥶 Cold</div>
+        <div class="chip" onclick="pick('weather','Hot',this)">🔥 Hot</div>
+      </div>
+    </div>
+
+    <!-- Mood -->
+    <div class="form-section">
+      <span class="field-label">💭 Mood</span>
+      <div class="chips" id="chips-mood">
+        <div class="chip" onclick="pick('mood','Determined',this)">😤 Determined</div>
+        <div class="chip active" onclick="pick('mood','Calm',this)">😌 Calm</div>
+        <div class="chip" onclick="pick('mood','Escaping',this)">🏃 Escaping</div>
+        <div class="chip" onclick="pick('mood','Warrior',this)">⚔️ Warrior</div>
+        <div class="chip" onclick="pick('mood','Grateful',this)">🙏 Grateful</div>
+        <div class="chip" onclick="pick('mood','Exhausted',this)">😮‍💨 Exhausted</div>
+      </div>
+    </div>
+
+    <!-- Terrain -->
+    <div class="form-section">
+      <span class="field-label">🗺️ Terrain</span>
+      <div class="chips" id="chips-terrain">
+        <div class="chip active" onclick="pick('terrain','Road',this)">🏙️ Road</div>
+        <div class="chip" onclick="pick('terrain','Trail / Forest',this)">🌲 Trail / Forest</div>
+        <div class="chip" onclick="pick('terrain','Beach',this)">🏖️ Beach</div>
+        <div class="chip" onclick="pick('terrain','Mountain',this)">⛰️ Mountain</div>
+        <div class="chip" onclick="pick('terrain','Track',this)">🔴 Track</div>
+      </div>
+    </div>
+
+    <!-- Time of day -->
+    <div class="form-section">
+      <span class="field-label">🕐 Time of Day</span>
+      <div class="chips" id="chips-time">
+        <div class="chip" onclick="pick('time','Dawn',this)">🌅 Dawn</div>
+        <div class="chip active" onclick="pick('time','Morning',this)">☀️ Morning</div>
+        <div class="chip" onclick="pick('time','Midday',this)">🌞 Midday</div>
+        <div class="chip" onclick="pick('time','Evening',this)">🌆 Evening</div>
+        <div class="chip" onclick="pick('time','Night',this)">🌙 Night</div>
+      </div>
+    </div>
+
+    <!-- Mode: Starting / Finished -->
+    <div class="form-section">
+      <span class="field-label">⚡ Status</span>
+      <div class="mode-row">
+        <div class="mode-btn active-start" id="mode-start" onclick="setMode('start')">
+          <div class="mode-icon">🏁</div>
+          <div class="mode-label">I'm Starting</div>
+          <div class="mode-sub">Motivate me</div>
+        </div>
+        <div class="mode-btn" id="mode-finish" onclick="setMode('finish')">
+          <div class="mode-icon">🏅</div>
+          <div class="mode-label">I Finished</div>
+          <div class="mode-sub">Celebrate me</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="gen-btn" onclick="generate()">Generate My Run ↗</button>
+    <div class="loading-bar" id="loading-bar"><div class="loading-fill"></div></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+
+    <div class="card-preview-wrap">
+      <div id="run-card">
+        <div class="card-top">
+          <div class="card-mode-badge" id="card-badge">STARTING</div>
+          <div class="card-run-name" id="card-name">—</div>
+        </div>
+        <div class="card-middle">
+          <div class="card-quote" id="card-quote">—</div>
+        </div>
+        <div class="card-bottom">
+          <div class="card-meta" id="card-meta">—</div>
+          <div class="card-brand">NAME YOUR RUN</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="action-btn primary" onclick="downloadCard()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Card
+      </button>
+      <button class="action-btn" onclick="copyQuote()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        <span id="copy-label">Copy Quote</span>
+      </button>
+    </div>
+    <button class="regen-btn" onclick="generate()">↻ Generate Again</button>
+
+    <!-- History -->
+    <div class="history">
+      <div class="history-title">Run History</div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>Name Your Run — built for runners</span>
+    <a href="https://github.com/recepzerk" target="_blank" rel="noopener">GitHub ↗</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  /* ── STATE ── */
+  const sel = {
+    distance: 'Half Marathon',
+    weather:  'Sunny',
+    mood:     'Calm',
+    terrain:  'Road',
+    time:     'Morning',
+  };
+  let mode = 'start';
+  let currentRun = null;
+  let history = JSON.parse(localStorage.getItem('nyr_history') || '[]');
+
+  /* ── CHIP PICKER ── */
+  function pick(group, val, el) {
+    sel[group] = val;
+    el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function pickDistance(val, el) {
+    sel.distance = val;
+    document.querySelectorAll('#chips-distance .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('distance-custom').value = '';
+  }
+
+  function onCustomDistance(val) {
+    if (val.trim()) {
+      sel.distance = val.trim();
+      document.querySelectorAll('#chips-distance .chip').forEach(c => c.classList.remove('active'));
+    } else {
+      sel.distance = 'Half Marathon';
+      const chips = document.querySelectorAll('#chips-distance .chip');
+      chips.forEach(c => { if (c.textContent.trim() === 'Half Marathon') c.classList.add('active'); });
+    }
+  }
+
+  /* ── MODE ── */
+  function setMode(m) {
+    mode = m;
+    document.getElementById('mode-start').className  = 'mode-btn' + (m === 'start'  ? ' active-start'  : '');
+    document.getElementById('mode-finish').className = 'mode-btn' + (m === 'finish' ? ' active-finish' : '');
+  }
+
+  /* ── GENERATE ── */
+  async function generate() {
+    const city = document.getElementById('city-input').value.trim() || 'My City';
+    const btn = document.getElementById('gen-btn');
+    const bar = document.getElementById('loading-bar');
+
+    btn.disabled = true;
+    bar.classList.add('show');
+
+    const modeText = mode === 'start'
+      ? 'The runner is about to start their run. Write a forward-looking, motivating, pre-run message.'
+      : 'The runner just finished their run. Write a celebratory, proud, post-run message.';
+
+    const toneMap = {
+      'Determined+Rainy':   'fierce and warrior-like',
+      'Warrior+Rainy':      'battle-hardened and relentless',
+      'Calm+Sunny':         'flowing, meditative and peaceful',
+      'Grateful+Sunny':     'warm, grateful and poetic',
+      'Escaping+Night':     'deep, philosophical and introspective',
+      'Escaping+Foggy':     'mysterious and freeing',
+      'Determined+Morning': 'explosive, energetic and fired up',
+      'Warrior+Dawn':       'epic and cinematic',
+    };
+    const toneKey = `${sel.mood}+${sel.weather}`;
+    const tone = toneMap[toneKey] || 'powerful and authentic';
+
+    const prompt = `You are a creative writer for a running app. Generate a unique run name and motivational quote.
+
+Run details:
+- City: ${city}
+- Distance: ${sel.distance}
+- Weather: ${sel.weather}
+- Mood: ${sel.mood}
+- Terrain: ${sel.terrain}
+- Time of day: ${sel.time}
+- Status: ${mode === 'start' ? 'Starting the run' : 'Just finished the run'}
+
+${modeText}
+
+Tone: ${tone}
+
+Return ONLY a valid JSON object, no markdown, no explanation:
+{
+  "name": "A creative, evocative run name (3-6 words, like a movie title or book chapter. Include the city name naturally if it fits. Examples: The Istanbul Dawn Redemption, A Rainy Forest Escape, The Midnight Road Warrior)",
+  "quote": "A powerful 2-3 sentence motivational quote matching the tone and details. First person. No clichés. Make it feel personal and raw."
+}`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await res.json();
+      const raw = data.content[0].text.trim().replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(raw);
+
+      currentRun = {
+        name: parsed.name,
+        quote: parsed.quote,
+        city, mode,
+        distance: sel.distance,
+        weather: sel.weather,
+        mood: sel.mood,
+        terrain: sel.terrain,
+        time: sel.time,
+        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+        id: Date.now(),
+      };
+
+      renderCard(currentRun);
+      saveHistory(currentRun);
+
+    } catch(e) {
+      // Fallback
+      const names = [
+        `The ${city} ${sel.time} ${sel.distance}`,
+        `A ${sel.weather} ${sel.terrain} Story`,
+        `The ${sel.mood} ${sel.distance} of ${city}`,
+      ];
+      const quotes = [
+        `This is your ${sel.time.toLowerCase()} in ${city}. The ${sel.weather.toLowerCase()} is just weather — you are the storm. ${sel.distance} and nothing stops you today.`,
+        `Every step on this ${sel.terrain.toLowerCase()} is yours. The ${sel.mood.toLowerCase()} feeling in your chest? That's fuel. Use it.`,
+      ];
+      currentRun = {
+        name: names[Math.floor(Math.random() * names.length)],
+        quote: quotes[Math.floor(Math.random() * quotes.length)],
+        city, mode, distance: sel.distance, weather: sel.weather,
+        mood: sel.mood, terrain: sel.terrain, time: sel.time,
+        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+        id: Date.now(),
+      };
+      renderCard(currentRun);
+      saveHistory(currentRun);
+    }
+
+    btn.disabled = false;
+    bar.classList.remove('show');
+  }
+
+  /* ── RENDER CARD ── */
+  function renderCard(run) {
+    const isFinish = run.mode === 'finish';
+    const badge = document.getElementById('card-badge');
+    badge.textContent = isFinish ? 'FINISHED' : 'STARTING';
+    badge.className = 'card-mode-badge ' + (isFinish ? 'finish' : 'start');
+
+    document.getElementById('card-name').textContent = run.name;
+    document.getElementById('card-quote').textContent = run.quote;
+    document.getElementById('card-meta').innerHTML =
+      `<strong>${run.city}</strong> · ${run.distance}<br>${run.weather} · ${run.time} · ${run.date}`;
+
+    const card = document.getElementById('run-card');
+    const gradients = {
+      'start+Rainy':   'radial-gradient(circle at 20% 80%, rgba(77,166,255,0.12) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%)',
+      'start+Sunny':   'radial-gradient(circle at 50% 90%, rgba(232,255,71,0.1) 0%, transparent 60%), radial-gradient(circle at 80% 10%, rgba(255,200,50,0.05) 0%, transparent 50%)',
+      'start+Night':   'radial-gradient(circle at 30% 70%, rgba(177,124,244,0.1) 0%, transparent 60%)',
+      'finish+Sunny':  'radial-gradient(circle at 50% 80%, rgba(232,255,71,0.15) 0%, transparent 60%)',
+      'finish+Rainy':  'radial-gradient(circle at 40% 60%, rgba(61,220,132,0.1) 0%, transparent 60%)',
+    };
+    const gKey = `${run.mode}+${run.weather}`;
+    const grad = gradients[gKey] || 'radial-gradient(circle at 20% 80%, rgba(232,255,71,0.06) 0%, transparent 50%)';
+    card.style.setProperty('--card-grad', grad);
+    card.style.background = `#0c0c0c`;
+
+    const pseudo = document.createElement('style');
+    pseudo.id = 'card-pseudo-style';
+    const existing = document.getElementById('card-pseudo-style');
+    if (existing) existing.remove();
+    pseudo.textContent = `#run-card::before { background-image: ${grad} !important; }`;
+    document.head.appendChild(pseudo);
+
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    renderHistory();
+  }
+
+  /* ── DOWNLOAD CARD ── */
+  async function downloadCard() {
+    const card = document.getElementById('run-card');
+    const btn = document.querySelector('.action-btn.primary');
+    btn.textContent = 'Generating…';
+
+    try {
+      const canvas = await html2canvas(card, {
+        scale: 3,
+        backgroundColor: '#0c0c0c',
+        useCORS: true,
+        logging: false,
+      });
+      const link = document.createElement('a');
+      link.download = (currentRun.name || 'my-run').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch(e) {
+      alert('Download failed. Try copying the quote instead.');
+    }
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Card';
+  }
+
+  /* ── COPY QUOTE ── */
+  function copyQuote() {
+    if (!currentRun) return;
+    const text = `"${currentRun.name}"\n\n${currentRun.quote}\n\n${currentRun.city} · ${currentRun.distance} · ${currentRun.date}\n#nameyourrun #running`;
+    navigator.clipboard.writeText(text).then(() => {
+      const lbl = document.getElementById('copy-label');
+      lbl.textContent = 'Copied!';
+      setTimeout(() => lbl.textContent = 'Copy Quote', 2000);
+    });
+  }
+
+  /* ── HISTORY ── */
+  function saveHistory(run) {
+    history.unshift(run);
+    if (history.length > 20) history = history.slice(0, 20);
+    localStorage.setItem('nyr_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function deleteHistory(id) {
+    history = history.filter(r => r.id !== id);
+    localStorage.setItem('nyr_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    if (history.length === 0) {
+      list.innerHTML = '<div style="font-size:13px;color:var(--dim);font-style:italic;padding:8px 0">Your runs will appear here.</div>';
+      return;
+    }
+    list.innerHTML = history.map(r => `
+      <div class="history-item">
+        <span class="history-badge ${r.mode}">${r.mode === 'finish' ? 'DONE' : 'START'}</span>
+        <div class="history-info">
+          <div class="history-name">${r.name}</div>
+          <div class="history-quote">${r.quote}</div>
+          <div class="history-meta">${r.city} · ${r.distance} · ${r.date}</div>
+        </div>
+        <button class="history-del" onclick="deleteHistory(${r.id})" title="Delete">×</button>
+      </div>`).join('');
+  }
+
+  /* ── INIT ── */
+  renderHistory();
+  document.getElementById('city-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') generate();
+  });
+</script>
+</body>
+</html>
