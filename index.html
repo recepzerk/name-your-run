@@ -470,14 +470,18 @@
       </div>
     </div>
 
-    <div class="action-row">
-      <button class="action-btn primary" onclick="downloadCard()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download Card
+    <div class="action-row" style="grid-template-columns:1fr 1fr 1fr;">
+      <button class="action-btn primary" id="btn-post" onclick="downloadCard('post')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+        Post (1:1)
+      </button>
+      <button class="action-btn primary" id="btn-story" onclick="downloadCard('story')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+        Story (9:16)
       </button>
       <button class="action-btn" onclick="copyQuote()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        <span id="copy-label">Copy Quote</span>
+        <span id="copy-label">Copy</span>
       </button>
     </div>
     <button class="regen-btn" onclick="generate()">↻ Generate Again</button>
@@ -684,26 +688,140 @@ Return ONLY a valid JSON object, no markdown, no explanation:
   }
 
   /* ── DOWNLOAD CARD ── */
-  async function downloadCard() {
-    const card = document.getElementById('run-card');
-    const btn = document.querySelector('.action-btn.primary');
+  async function downloadCard(format) {
+    if (!currentRun) return;
+    const isStory = format === 'story';
+    const btn = document.getElementById(isStory ? 'btn-story' : 'btn-post');
+    const origHTML = btn.innerHTML;
     btn.textContent = 'Generating…';
+    btn.disabled = true;
+
+    const name = (currentRun.name || 'my-run').replace(/[^a-z0-9]/gi, '-').toLowerCase();
 
     try {
-      const canvas = await html2canvas(card, {
-        scale: 3,
-        backgroundColor: '#0c0c0c',
-        useCORS: true,
-        logging: false,
+      // Build an offscreen canvas with correct dimensions
+      const W = isStory ? 1080 : 1080;
+      const H = isStory ? 1920 : 1080;
+      const scale = 2;
+
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width  = W * scale;
+      offCanvas.height = H * scale;
+      const ctx = offCanvas.getContext('2d');
+      ctx.scale(scale, scale);
+
+      // Background
+      ctx.fillStyle = '#0c0c0c';
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle radial glow
+      const grad = ctx.createRadialGradient(W * 0.2, H * 0.8, 0, W * 0.2, H * 0.8, W * 0.6);
+      grad.addColorStop(0, 'rgba(200,64,10,0.12)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      const pad  = isStory ? 80  : 60;
+      const mid  = isStory ? H / 2 : H / 2;
+
+      // Badge
+      const isFinish = currentRun.mode === 'finish';
+      const badgeColor = isFinish ? '#c8400a' : '#1a8a50';
+      const badgeText  = isFinish ? 'FINISHED' : 'STARTING';
+      ctx.fillStyle = badgeColor + '28';
+      roundRect(ctx, pad, pad, 130, 34, 17);
+      ctx.fill();
+      ctx.fillStyle = badgeColor;
+      ctx.font = 'bold 13px "Outfit", sans-serif';
+      ctx.letterSpacing = '2px';
+      ctx.fillText(badgeText, pad + 16, pad + 22);
+
+      // Run name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = isStory ? 'italic 900 96px "Barlow Condensed", sans-serif'
+                         : 'italic 900 72px "Barlow Condensed", sans-serif';
+      ctx.letterSpacing = '1px';
+      const nameLines = wrapText(ctx, currentRun.name, W - pad * 2, isStory ? 96 : 72);
+      const nameY = isStory ? pad + 80 : pad + 60;
+      nameLines.forEach((line, i) => {
+        ctx.fillText(line, pad, nameY + i * (isStory ? 100 : 78));
       });
+
+      // Accent line
+      const lineY = nameY + nameLines.length * (isStory ? 100 : 78) + (isStory ? 48 : 32);
+      ctx.fillStyle = '#c8400a';
+      ctx.fillRect(pad, lineY, 3, isStory ? 120 : 90);
+
+      // Quote
+      ctx.fillStyle = 'rgba(255,255,255,0.78)';
+      ctx.font = isStory ? 'italic 300 36px "Outfit", sans-serif'
+                         : 'italic 300 26px "Outfit", sans-serif';
+      ctx.letterSpacing = '0px';
+      const quoteLines = wrapText(ctx, currentRun.quote, W - pad * 2 - 28, isStory ? 36 : 26);
+      const quoteY = lineY + (isStory ? 8 : 6);
+      quoteLines.forEach((line, i) => {
+        ctx.fillText(line, pad + 20, quoteY + i * (isStory ? 52 : 38));
+      });
+
+      // Meta bottom
+      ctx.fillStyle = 'rgba(255,255,255,0.38)';
+      ctx.font = isStory ? '400 28px "Outfit", sans-serif' : '400 20px "Outfit", sans-serif';
+      ctx.fillText(
+        `${currentRun.city}  ·  ${currentRun.distance}  ·  ${currentRun.weather}  ·  ${currentRun.date}`,
+        pad, H - pad - (isStory ? 48 : 36)
+      );
+
+      // Brand
+      ctx.fillStyle = '#c8400a';
+      ctx.globalAlpha = 0.55;
+      ctx.font = isStory ? 'italic 700 24px "Barlow Condensed", sans-serif'
+                         : 'italic 700 18px "Barlow Condensed", sans-serif';
+      ctx.letterSpacing = '3px';
+      ctx.fillText('NAME YOUR RUN', pad, H - pad);
+      ctx.globalAlpha = 1;
+
       const link = document.createElement('a');
-      link.download = (currentRun.name || 'my-run').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.png';
-      link.href = canvas.toDataURL('image/png');
+      link.download = name + (isStory ? '-story' : '-post') + '.png';
+      link.href = offCanvas.toDataURL('image/png');
       link.click();
+
     } catch(e) {
       alert('Download failed. Try copying the quote instead.');
     }
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Card';
+
+    btn.innerHTML = origHTML;
+    btn.disabled = false;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function wrapText(ctx, text, maxWidth, fontSize) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
   }
 
   /* ── COPY QUOTE ── */
